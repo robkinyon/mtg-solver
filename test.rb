@@ -8,33 +8,26 @@ $:.unshift "./lib"
 require "mtg/solver"
 
 deck = [
-    MTG::Solver.land(),
-    MTG::Solver.land(),
-    MTG::Solver.land(),
-    MTG::Solver.land(),
-    MTG::Solver.land(),
-    MTG::Solver.land(),
-    MTG::Solver.land(),
-    MTG::Solver.bolt(),
-    MTG::Solver.bolt(),
-    MTG::Solver.bolt(),
-    MTG::Solver.bolt(),
-    MTG::Solver.bolt(),
-    MTG::Solver.bolt(),
-    MTG::Solver.bolt(),
+    MTG::Solver::Card.land,
+    MTG::Solver::Card.land,
+    MTG::Solver::Card.land,
+    MTG::Solver::Card.land,
+    MTG::Solver::Card.land,
+    MTG::Solver::Card.land,
+    MTG::Solver::Card.land,
+    MTG::Solver::Card.bolt,
+    MTG::Solver::Card.bolt,
+    MTG::Solver::Card.bolt,
+    MTG::Solver::Card.bolt,
+    MTG::Solver::Card.bolt,
+    MTG::Solver::Card.bolt,
+    MTG::Solver::Card.bolt,
 ]
 
-solver = MTG::Solver.new(deck)
-wins = {}
-solver.deck.unique_permutation do |combo|
-    turn = solver.find_winning_turn(combo)
-    if ! wins.include? turn
-        wins[turn] = 0
-    end
-    wins[turn] += 1
-end
+solver = MTG::Solver.new(deck: deck)
+solver.solve
 
-puts wins
-puts wins.values.sum
+puts solver.wins
+puts solver.wins.values.sum
 
 puts "Ok"
