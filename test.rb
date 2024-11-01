@@ -1,7 +1,5 @@
 #!/usr/bin/env ruby
 
-require 'unique_permutation'
-
 puts "Hello"
 
 $:.unshift "./lib"

@@ -1,3 +1,5 @@
+require 'unique_permutation'
+
 require "mtg/solver/version"
 require "mtg/solver/cards"
 require "mtg/solver/game"
@@ -5,7 +7,21 @@ require "mtg/solver/game"
 class MTG::Solver
   attr_accessor :deck, :wins
 
-  def initialize(deck:)
+  attr_accessor :initial_life
+  attr_accessor :initial_draw, :lands_per_turn, :mana_per_bolt
+
+  def initialize(
+    deck:,
+    initial_draw: 7,
+    lands_per_turn: 1,
+    mana_per_bolt: 1,
+    initial_life: 7
+  )
+    @initial_draw = initial_draw
+    @lands_per_turn = lands_per_turn
+    @mana_per_bolt = mana_per_bolt
+    @initial_life = initial_life
+
     @deck = deck
     @wins = {}
   end
@@ -21,6 +37,12 @@ class MTG::Solver
   end
 
   def find_winning_turn(deck:)
-    MTG::Solver::Game.new(deck: deck).play
+    MTG::Solver::Game.new(
+      deck: deck,
+      initial_draw: self.initial_draw,
+      lands_per_turn: self.lands_per_turn,
+      mana_per_bolt: self.mana_per_bolt,
+      initial_life: self.initial_life,
+    ).play
   end
 end

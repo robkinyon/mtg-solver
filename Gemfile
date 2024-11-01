@@ -1,1 +1,2 @@
-gem 'unique_permutation'
+source 'https://rubygems.org'
+gemspec

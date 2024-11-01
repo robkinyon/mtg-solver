@@ -2,11 +2,15 @@ require 'mtg/solver/version'
 require 'mtg/solver/cards'
 
 # TODO:
-# * Handle deck exhaustion later
+# * Handle deck exhaustion
 # * Represent tapping land
+# * Add hand limits
 
 class MTG::Solver::Game
+  # These are the in-game elements
   attr_accessor :deck, :hand, :in_play, :graveyard, :out_of_play
+
+  # These are the game rule options
   attr_accessor :opponent_life
   attr_accessor :initial_draw, :lands_per_turn, :mana_per_bolt
 
