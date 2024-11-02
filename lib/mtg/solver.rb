@@ -46,6 +46,6 @@ class MTG::Solver
       lands_per_turn: self.lands_per_turn,
       mana_per_bolt: self.mana_per_bolt,
       initial_life: self.initial_life,
-    ).play
+    ).run
   end
 end
