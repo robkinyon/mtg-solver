@@ -1,3 +1,5 @@
+$:.push File.expand_path('../lib', __FILE__)
+
 require 'rake/clean'
 require 'bundler/gem_tasks'
 require 'rubygems/tasks'
