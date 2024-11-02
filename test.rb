@@ -5,22 +5,10 @@ puts "Hello"
 $:.unshift "./lib"
 require "mtg/solver"
 
-deck = [
-    MTG::Solver::Card.land,
-    MTG::Solver::Card.land,
-    MTG::Solver::Card.land,
-    MTG::Solver::Card.land,
-    MTG::Solver::Card.land,
-    MTG::Solver::Card.land,
-    MTG::Solver::Card.land,
-    MTG::Solver::Card.bolt,
-    MTG::Solver::Card.bolt,
-    MTG::Solver::Card.bolt,
-    MTG::Solver::Card.bolt,
-    MTG::Solver::Card.bolt,
-    MTG::Solver::Card.bolt,
-    MTG::Solver::Card.bolt,
-]
+deck = {
+  MTG::Solver::Card.land => 7,
+  MTG::Solver::Card.bolt => 7,
+}
 
 solver = MTG::Solver.new(deck: deck)
 solver.solve

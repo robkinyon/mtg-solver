@@ -22,7 +22,10 @@ class MTG::Solver
     @mana_per_bolt = mana_per_bolt
     @initial_life = initial_life
 
-    @deck = deck
+    @deck = []
+    deck.each do |card, num|
+      (1..num).each {@deck.concat([card])}
+    end
     @wins = {}
   end
 
