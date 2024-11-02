@@ -1,9 +1,10 @@
 describe "basic" do
-  context "Life: 7, Initial Draw: 7" do
+  context "Life: 7, Initial Draw: 7, Bolt Dmg: 1" do
     before(:all) {
       @conditions = {
         initial_life: 7,
         initial_draw: 7,
+        dmg_per_bolt: 1,
       }
     }
     it "handles L/B" do
