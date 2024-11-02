@@ -2,11 +2,13 @@ require 'mtg/solver/version'
 require 'mtg/solver/cards'
 
 # TODO:
-# * Handle deck exhaustion
 # * Represent tapping land
 # * Add hand limits
 
 class MTG::Solver::Game
+  class DeckExhaustedError < StandardError
+  end
+
   # These are the in-game elements
   attr_accessor :deck, :hand, :in_play, :graveyard, :out_of_play
 
@@ -49,9 +51,14 @@ class MTG::Solver::Game
       end
     end
     return turn
+  rescue DeckExhaustedError
+    return "E"
   end
 
   def draw(num: 1)
+    if self.deck.length < num
+      raise DeckExhaustedError
+    end
     self.hand.concat self.deck.slice!(0, num)
   end
 
