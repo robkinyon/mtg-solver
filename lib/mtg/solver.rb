@@ -8,19 +8,22 @@ class MTG::Solver
   attr_accessor :deck, :wins
 
   attr_accessor :initial_life
-  attr_accessor :initial_draw, :lands_per_turn, :mana_per_bolt
+  attr_accessor :initial_draw, :lands_per_turn
+  attr_accessor :mana_per_bolt, :dmg_per_bolt
 
   def initialize(
     deck:,
+    initial_life: 7,
     initial_draw: 7,
     lands_per_turn: 1,
     mana_per_bolt: 1,
-    initial_life: 7
+    dmg_per_bolt: 1
   )
+    @initial_life = initial_life
     @initial_draw = initial_draw
     @lands_per_turn = lands_per_turn
     @mana_per_bolt = mana_per_bolt
-    @initial_life = initial_life
+    @dmg_per_bolt = dmg_per_bolt
 
     @deck = []
     deck.each do |card, num|
@@ -42,10 +45,11 @@ class MTG::Solver
   def find_winning_turn(deck:)
     MTG::Solver::Game.new(
       deck: deck,
+      initial_life: self.initial_life,
       initial_draw: self.initial_draw,
       lands_per_turn: self.lands_per_turn,
       mana_per_bolt: self.mana_per_bolt,
-      initial_life: self.initial_life,
+      dmg_per_bolt: self.dmg_per_bolt,
     ).run
   end
 end

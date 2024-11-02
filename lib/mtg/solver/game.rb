@@ -14,19 +14,24 @@ class MTG::Solver::Game
 
   # These are the game rule options
   attr_accessor :opponent_life
-  attr_accessor :initial_draw, :lands_per_turn, :mana_per_bolt
+  attr_accessor :initial_draw, :lands_per_turn
+
+  # This needs to be shoved into the card
+  attr_accessor :mana_per_bolt, :dmg_per_bolt
 
   def initialize(
     deck:,
     initial_life: 7,
     initial_draw: 7,
     lands_per_turn: 1,
-    mana_per_bolt: 1
+    mana_per_bolt: 1,
+    dmg_per_bolt: 1
   )
     @initial_draw = initial_draw
     @opponent_life = initial_life
     @lands_per_turn = lands_per_turn
     @mana_per_bolt = mana_per_bolt
+    @dmg_per_bolt = dmg_per_bolt
 
     @deck = deck
     @hand = []
@@ -46,7 +51,7 @@ class MTG::Solver::Game
       while mana > 0
         if play(card: MTG::Solver::Card.bolt, destination: self.graveyard)
           mana -= self.mana_per_bolt
-          self.opponent_life -= 1
+          self.opponent_life -= self.dmg_per_bolt
         else
           break
         end

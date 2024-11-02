@@ -1,9 +1,10 @@
 describe "basic" do
-  context "Life: 1, Initial Draw: 1" do
+  context "Life: 2, Initial Draw: 1, Bolt Dmg 1" do
     before(:all) {
       @conditions = {
-        initial_life: 1,
+        initial_life: 2,
         initial_draw: 1,
+        dmg_per_bolt: 1,
       }
     }
     it "handles L/B" do
@@ -13,7 +14,7 @@ describe "basic" do
           MTG::Solver::Card.bolt => 1,
         },
         conditions: @conditions,
-        expected: {1 => 2},
+        expected: {"E" => 2},
       )
     end
     it "handles LLB" do
@@ -23,7 +24,7 @@ describe "basic" do
           MTG::Solver::Card.bolt => 1,
         },
         conditions: @conditions,
-        expected: {1 => 2, 2 => 1},
+        expected: {"E" => 3},
       )
     end
     it "handles LBB" do
@@ -33,7 +34,7 @@ describe "basic" do
           MTG::Solver::Card.bolt => 2,
         },
         conditions: @conditions,
-        expected: {1 => 2, 2 => 1},
+        expected: {"E" => 1, 2 => 2},
       )
     end
   end
