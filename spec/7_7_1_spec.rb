@@ -27,5 +27,23 @@ describe "basic" do
         expected: {4 => 330, 5 => 462, 6 => 924, 7 => 1716},
       )
     end
+    # This takes too long to run.
+    #it "handles 8L/12B" do
+    #  run_test(
+    #    deck: {
+    #      MTG::Solver::Card.land => 8,
+    #      MTG::Solver::Card.bolt => 12,
+    #    },
+    #    conditions: @conditions,
+    #    expected: {
+    #     4 => 65268,
+    #     5 => 27482,
+    #     6 => 19845,
+    #     7 => 10360,
+    #     8 => 3014,
+    #     9 => 1,
+    #    },
+    #  )
+    #end
   end
 end
