@@ -15,6 +15,7 @@ describe "basic" do
         },
         conditions: @conditions,
         expected: {"E" => 2},
+        calls: 2,
       )
     end
     it "handles LLB" do
@@ -25,6 +26,7 @@ describe "basic" do
         },
         conditions: @conditions,
         expected: {"E" => 3},
+        calls: 3,
       )
     end
     it "handles LBB" do
@@ -35,6 +37,7 @@ describe "basic" do
         },
         conditions: @conditions,
         expected: {"E" => 1, 2 => 2},
+        calls: 3,
       )
     end
   end

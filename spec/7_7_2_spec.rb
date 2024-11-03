@@ -15,6 +15,7 @@ describe "basic" do
         },
         conditions: @conditions,
         expected: {3 => 3312, 4 => 120},
+        calls: 1584,
       )
     end
   end

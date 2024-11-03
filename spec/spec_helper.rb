@@ -6,7 +6,7 @@ end
 
 require 'mtg/solver'
 
-def run_test(deck:, conditions:, expected:)
+def run_test(deck:, conditions:, expected:, calls:)
   algo = Proc.new do |g|
     g.play(card: MTG::Solver::Card.land, destination: g.in_play)
     mana = g.in_play.length
@@ -26,4 +26,5 @@ def run_test(deck:, conditions:, expected:)
   )
   solver.solve
   expect(solver.wins).to eq(expected)
+  expect(solver.calls).to eq(calls)
 end

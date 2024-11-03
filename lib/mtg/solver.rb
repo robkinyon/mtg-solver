@@ -1,11 +1,11 @@
-require 'unique_permutation'
+require 'unique_permutationx'
 
 require "mtg/solver/version"
 require "mtg/solver/cards"
 require "mtg/solver/game"
 
 class MTG::Solver
-  attr_accessor :deck, :wins, :algo
+  attr_accessor :deck, :wins, :algo, :calls
 
   attr_accessor :initial_life
   attr_accessor :initial_draw, :lands_per_turn
@@ -32,15 +32,28 @@ class MTG::Solver
       (1..num).each {@deck.concat([card])}
     end
     @wins = {}
+    @calls = false
   end
 
   def solve
-    self.deck.unique_permutation do |combo|
+    rv, calls = self.deck.unique_permutation do |combo|
       turn = find_winning_turn(deck: combo)
+      if turn == "E"
+        next 0
+      end
+      next turn + self.initial_draw
+    end
+    self.calls = calls
+    rv.each_key do |k|
+      if k == 0
+        turn = "E"
+      else
+        turn = k - self.initial_draw
+      end
       if ! self.wins.include? turn
         self.wins[turn] = 0
       end
-      self.wins[turn] += 1
+      self.wins[turn] += rv[k]
     end
   end
 
