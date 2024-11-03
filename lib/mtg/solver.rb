@@ -5,7 +5,7 @@ require "mtg/solver/cards"
 require "mtg/solver/game"
 
 class MTG::Solver
-  attr_accessor :deck, :wins
+  attr_accessor :deck, :wins, :algo
 
   attr_accessor :initial_life
   attr_accessor :initial_draw, :lands_per_turn
@@ -13,6 +13,7 @@ class MTG::Solver
 
   def initialize(
     deck:,
+    algo:,
     initial_life: 7,
     initial_draw: 7,
     lands_per_turn: 1,
@@ -25,6 +26,7 @@ class MTG::Solver
     @mana_per_bolt = mana_per_bolt
     @dmg_per_bolt = dmg_per_bolt
 
+    @algo = algo
     @deck = []
     deck.each do |card, num|
       (1..num).each {@deck.concat([card])}
@@ -45,6 +47,7 @@ class MTG::Solver
   def find_winning_turn(deck:)
     MTG::Solver::Game.new(
       deck: deck,
+      algo: @algo,
       initial_life: self.initial_life,
       initial_draw: self.initial_draw,
       lands_per_turn: self.lands_per_turn,

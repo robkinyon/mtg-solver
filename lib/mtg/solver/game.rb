@@ -21,6 +21,7 @@ class MTG::Solver::Game
 
   def initialize(
     deck:,
+    algo:,
     initial_life: 7,
     initial_draw: 7,
     lands_per_turn: 1,
@@ -33,6 +34,7 @@ class MTG::Solver::Game
     @mana_per_bolt = mana_per_bolt
     @dmg_per_bolt = dmg_per_bolt
 
+    @algo = algo
     @deck = deck
     @hand = []
     @in_play = []
@@ -46,16 +48,17 @@ class MTG::Solver::Game
     while self.opponent_life > 0
       turn += 1
       draw
-      play(card: MTG::Solver::Card.land, destination: self.in_play)
-      mana = self.in_play.length
-      while mana > 0
-        if play(card: MTG::Solver::Card.bolt, destination: self.graveyard)
-          mana -= self.mana_per_bolt
-          self.opponent_life -= self.dmg_per_bolt
-        else
-          break
-        end
-      end
+      @algo.call self
+      # play(card: MTG::Solver::Card.land, destination: self.in_play)
+      # mana = self.in_play.length
+      # while mana > 0
+      #   if play(card: MTG::Solver::Card.bolt, destination: self.graveyard)
+      #     mana -= self.mana_per_bolt
+      #     self.opponent_life -= self.dmg_per_bolt
+      #   else
+      #     break
+      #   end
+      # end
     end
     return turn
   rescue DeckExhaustedError
