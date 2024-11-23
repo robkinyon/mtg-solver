@@ -49,16 +49,6 @@ class MTG::Solver::Game
       turn += 1
       draw
       @algo.call self
-      # play(card: MTG::Solver::Card.land, destination: self.in_play)
-      # mana = self.in_play.length
-      # while mana > 0
-      #   if play(card: MTG::Solver::Card.bolt, destination: self.graveyard)
-      #     mana -= self.mana_per_bolt
-      #     self.opponent_life -= self.dmg_per_bolt
-      #   else
-      #     break
-      #   end
-      # end
     end
     return turn
   rescue DeckExhaustedError
