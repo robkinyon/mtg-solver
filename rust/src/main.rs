@@ -2,9 +2,6 @@ mod solver;
 
 fn main() {
     use solver::Solver;
-    let s = Solver {
-        initial_life: 20,
-        initial_draw: 7,
-    };
+    let s = Solver::new();
     println!("Hello, world! Solution is {}", s.solve());
 }
