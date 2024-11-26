@@ -5,6 +5,7 @@ pub struct Solver {
     initial_draw: u8,
 }
 
+use game::Game;
 impl Solver {
     pub fn new() -> Self {
         Self {
@@ -13,9 +14,8 @@ impl Solver {
         }
     }
     pub fn solve(&self) -> u8 {
-        use game::Game;
-        let g = Game::new();
-        g.value() + self.initial_life * self.initial_draw
+        let mut g = Game::new(self.initial_draw, self.initial_life);
+        g.run()
     }
 }
 
@@ -26,6 +26,6 @@ mod tests {
     #[test]
     fn solver_solves() {
         let s = Solver::new();
-        assert_eq!(s.solve(), 155);
+        assert_eq!(s.solve(), 6);
     }
 }
