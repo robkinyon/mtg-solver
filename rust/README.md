@@ -5,7 +5,10 @@ create a version that is performant enough to run on my S20+.
 
 ## Development
 
-* `cargo run` (build + run)
+* `cargo test` to run unit tests
+* `cargo llvm-cov` to establish test coverage
+* `cargo run` to run `main.rs`'s code
+* `cargo fmt` to reformat the codebase
 
 ## Release
 

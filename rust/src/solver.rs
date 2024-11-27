@@ -15,7 +15,10 @@ impl Solver {
     }
     pub fn solve(&self) -> u8 {
         let mut g = Game::new(self.initial_draw, self.initial_life);
-        g.run()
+        match g.run() {
+            Ok(i) => return i,
+            Err(_) => return 0,
+        }
     }
 }
 

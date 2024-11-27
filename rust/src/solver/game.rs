@@ -8,6 +8,8 @@ pub struct Game {
     opponent_life: i8,
 }
 
+pub struct DeckExhaustion;
+
 impl Game {
     pub fn new(initial_draw: u8, initial_life: u8) -> Self {
         Self {
@@ -32,21 +34,25 @@ impl Game {
         self.opponent_life = self.opponent_life - turn as i8;
     }
 
-    fn draw(&mut self, num: u8) {
-        // Need to propagate deck exhaustion
+    fn draw(&mut self, num: u8) -> Result<(), DeckExhaustion> {
         for _n in 1..num {
-            self.hand.push(self.deck.pop().unwrap());
+            if let Some(card) = self.deck.pop() {
+                self.hand.push(card);
+            } else {
+                return Err(DeckExhaustion);
+            }
         }
+        Ok(())
     }
 
-    pub fn run(&mut self) -> u8 {
+    pub fn run(&mut self) -> Result<u8, DeckExhaustion> {
         let mut turn: u8 = 0;
-        self.draw(self.initial_draw);
+        self.draw(self.initial_draw)?;
         while self.opponent_life > 0 {
             turn += 1;
-            self.draw(1);
+            self.draw(1)?;
             self.algo(turn);
         }
-        turn
+        Ok(turn)
     }
 }

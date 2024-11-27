@@ -4,7 +4,7 @@ This is my personal project to create a goldfish solver for the game Magic, the
 Gathering. The idea is that a user provides:
 
 * a deck (list of cards with numbers of each one)
-* a function that implements a turn 
+* a function that implements a turn
 * play/draw and mulligan
 
 Given those two things, the solver will find every unique combination of cards
