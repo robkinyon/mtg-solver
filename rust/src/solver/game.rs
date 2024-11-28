@@ -95,3 +95,14 @@ impl Game {
         Ok(turn)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn game_constructor() {
+        let g = Game::new(7, 20);
+        assert_eq!(g.run().unwrap(), 6);
+    }
+}
