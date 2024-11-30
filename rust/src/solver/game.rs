@@ -44,8 +44,9 @@ impl Game {
         }
     }
 
+    // In order to use a simple Vec instead of a Deque, the deck is stored
+    // in reverse. That allows us to use push/pop semantics instead of shift.
     fn draw(&mut self, num: u8) -> Result<(), DeckExhaustion> {
-        // This needs to become shift, not pop
         for _n in 0..num {
             if let Some(card) = self.deck.pop() {
                 self.hand.push(card);

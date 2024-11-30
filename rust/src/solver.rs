@@ -20,9 +20,9 @@ impl Solver {
         // Mountain: 1
         // Bolt: 2
         let initial_deck: Vec<u8> = vec![
-            1, 1, 1, 1, 1, 1, 1, // Initial hand
+            1, // 1, 1, 1, 1, 1, 1, // Extra cards
             2, 2, 2, 2, 2, 2, 2, // Draw 7 bolts
-            1, 1, 1, 1, 1, 1, // Extra cards
+            1, 1, 1, 1, 1, 1, 1, // Initial hand
         ];
         println!("{initial_deck:?}");
         let mut wins: Vec<_> = iter::repeat(0).take(8).collect();
@@ -57,6 +57,6 @@ mod tests {
     #[test]
     fn solver_solves() {
         let s = Solver::new();
-        assert_eq!(s.solve(), [0, 0, 0, 0, 0, 0, 1, 0]);
+        assert_eq!(s.solve(), [0, 0, 0, 0, 0, 0, 0, 1]);
     }
 }
