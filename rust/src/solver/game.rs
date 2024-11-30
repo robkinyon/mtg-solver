@@ -1,4 +1,4 @@
-#[derive(Debug)]
+//#[derive(Debug)]
 pub struct Game {
     deck: Vec<u8>,
     hand: Vec<u8>,
@@ -9,23 +9,18 @@ pub struct Game {
     opponent_life: i8,
 }
 
+#[derive(Debug)]
 pub struct DeckExhaustion;
 
 impl Game {
-    pub fn new(initial_draw: u8, initial_life: u8) -> Self {
+    pub fn new(initial_draw: u8, initial_life: u8, deck: Vec<u8>) -> Self {
         Self {
-            // Mountain: 1
-            // Bolt: 2
-            deck: vec![
-                1, 1, 1, 1, 1, 1, 1, // Initial hand
-                2, 2, 2, 2, 2, 2, 2, // Draw 7 bolts
-                1, 1, 1, 1, 1, 1, // Extra cards
-            ],
+            deck,
             hand: Vec::new(),
             in_play: Vec::new(),
             graveyard: Vec::new(),
             // out_of_play: Vec::new(),
-            initial_draw: initial_draw,
+            initial_draw,
             opponent_life: initial_life as i8,
             /*
             algo: |game, turn| {
@@ -39,10 +34,10 @@ impl Game {
         self.play_to_in_play(1); // 1 == Mountain
         let mut mana: u8 = self.in_play.len() as u8;
         while mana > 0 {
+            // 2 == Bolt
             if self.play_to_graveyard(2) {
-                // 2 == Bolt
-                mana = mana - 1 as u8;
-                self.opponent_life = self.opponent_life - 3 as i8;
+                mana -= 1_u8; // Cost of a bolt
+                self.opponent_life -= 3_i8; // Dmg of a bolt
             } else {
                 break;
             }
@@ -102,7 +97,15 @@ mod tests {
 
     #[test]
     fn game_constructor() {
-        let g = Game::new(7, 20);
+        let mut g = Game::new(
+            7,
+            20,
+            vec![
+                1, 1, 1, 1, 1, 1, 1, // Initial hand
+                2, 2, 2, 2, 2, 2, 2, // Draw 7 bolts
+                1, 1, 1, 1, 1, 1, // Extra cards
+            ],
+        );
         assert_eq!(g.run().unwrap(), 6);
     }
 }
