@@ -16,6 +16,8 @@ describe "basic" do
         conditions: @conditions,
         expected: {3 => 3312, 4 => 120},
         calls: 1584,
+        total: 3432,
+        permutations: 87178291200,
       )
     end
   end

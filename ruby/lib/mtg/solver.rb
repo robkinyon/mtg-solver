@@ -5,7 +5,7 @@ require "mtg/solver/cards"
 require "mtg/solver/game"
 
 class MTG::Solver
-  attr_accessor :deck, :wins, :algo, :calls
+  attr_accessor :deck, :wins, :algo, :calls, :total, :permutations
 
   attr_accessor :initial_life
   attr_accessor :initial_draw, :lands_per_turn
@@ -33,10 +33,13 @@ class MTG::Solver
     end
     @wins = {}
     @calls = false
+    @total = false
+    @permutations = 1
+    1.upto(@deck.length) {|x| @permutations *= x}
   end
 
   def solve
-    rv, calls = self.deck.unique_permutation do |combo|
+    rv, calls, total = self.deck.unique_permutation do |combo|
       turn = find_winning_turn(deck: combo)
       if turn == "E"
         next 0
@@ -44,6 +47,7 @@ class MTG::Solver
       next turn + self.initial_draw
     end
     self.calls = calls
+    self.total = total
     rv.each_key do |k|
       if k == 0
         turn = "E"

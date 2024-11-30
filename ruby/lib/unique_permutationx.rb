@@ -8,11 +8,12 @@ class Array
 	def unique_permutation(&block)
     return enum_for(:unique_permutation) unless block_given?
 
-    calls = 0
+    calls, total = 0, 0
     saved = {}
     array_copy = self.sort
     rv = yield array_copy.dup
     calls += 1
+    total += 1
     saved[rv] = 1
     return saved, calls if size < 2
 
@@ -34,13 +35,15 @@ class Array
 
       if anchor && anchor < j && anchor < l
         saved[anchor] = (saved[anchor] || 0) + 1
+        total += 1
       else
         rv = yield array_copy.dup
         calls += 1
+        total += 1
         saved[rv] = (saved[rv] || 0) + 1
         anchor = rv == 0 ? false : rv
       end
     end
-    return saved, calls
+    return saved, calls, total
 	end
 end
