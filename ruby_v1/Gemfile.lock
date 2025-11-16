@@ -16,32 +16,33 @@ GEM
       pp (>= 0.6.0)
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
-    json (1.8.6)
+    json (2.16.0)
     pp (0.6.3)
       prettyprint
     prettyprint (0.2.0)
     psych (5.2.6)
       date
       stringio
-    rake (10.5.0)
+    rake (13.3.1)
     rdoc (6.15.1)
       erb
       psych (>= 4.0.0)
       tsort
     reline (0.6.3)
       io-console (~> 0.5)
-    rspec (3.0.0)
-      rspec-core (~> 3.0.0)
-      rspec-expectations (~> 3.0.0)
-      rspec-mocks (~> 3.0.0)
-    rspec-core (3.0.4)
-      rspec-support (~> 3.0.0)
-    rspec-expectations (3.0.4)
+    rspec (3.13.2)
+      rspec-core (~> 3.13.0)
+      rspec-expectations (~> 3.13.0)
+      rspec-mocks (~> 3.13.0)
+    rspec-core (3.13.6)
+      rspec-support (~> 3.13.0)
+    rspec-expectations (3.13.5)
       diff-lcs (>= 1.2.0, < 2.0)
-      rspec-support (~> 3.0.0)
-    rspec-mocks (3.0.4)
-      rspec-support (~> 3.0.0)
-    rspec-support (3.0.4)
+      rspec-support (~> 3.13.0)
+    rspec-mocks (3.13.7)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.13.0)
+    rspec-support (3.13.6)
     rubygems-tasks (0.2.6)
       irb (~> 1.0)
       rake (>= 10.0.0)
@@ -60,12 +61,12 @@ PLATFORMS
   x86_64-linux-gnu
 
 DEPENDENCIES
-  json (~> 1, >= 1.7.7)
+  json
   mtg-solver!
-  rake (~> 10)
-  rspec (~> 3.0.0, >= 3.0.0)
-  rubygems-tasks (~> 0)
-  simplecov (~> 0)
+  rake
+  rspec
+  rubygems-tasks
+  simplecov
 
 BUNDLED WITH
    2.7.2

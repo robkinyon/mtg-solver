@@ -1,4 +1,3 @@
-#$LOAD_PATH.unshift 'lib'
 #require 'mtg/solver/version'
 
 Gem::Specification.new do |s|
@@ -12,20 +11,21 @@ Gem::Specification.new do |s|
   s.homepage = 'https://github.com/robkinyon/mtg-solver'
 
   # Don't tramp along our dot-files, except for .rspec
-  s.files         = `git ls-files ruby_v1`.split("\n").select { |filename|
+  s.files         = `git ls-files`.split("\n").select { |filename|
     !filename.match(/^\./) || filename == '.rspec'
   }
-  s.test_files    = `git ls-files ruby_v1 -- {test,spec,features}/*`.split("\n")
-  s.executables   = `git ls-files ruby_v1 -- {bin}/*`.split("\n")
+  s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
+  s.executables   = `git ls-files -- {bin}/*`.split("\n")
   s.require_paths = %w(lib)
 
   s.required_ruby_version = '>= 3'
 
   s.add_dependency 'unique_permutation'
+  #s.add_dependency 'erb', '<6'
 
-  s.add_development_dependency 'rake', '~> 10'
-  s.add_development_dependency 'rspec', '~> 3.0.0', '>= 3.0.0'
-  s.add_development_dependency 'simplecov', '~> 0'
-  s.add_development_dependency 'rubygems-tasks', '~> 0'
-  s.add_development_dependency 'json', '~> 1', '>=1.7.7'
+  s.add_development_dependency 'rake'
+  s.add_development_dependency 'rspec'
+  s.add_development_dependency 'simplecov'
+  s.add_development_dependency 'rubygems-tasks'
+  s.add_development_dependency 'json'
 end
