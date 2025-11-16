@@ -27,12 +27,50 @@ class MTG::Solver
     @decklist = decklist
   end
 
+  def list_to_hash(input)
+    rv = Hash.new(0)
+    input.each do |item|
+      rv[item] += 1
+    end
+    return rv
+  end
+
+  def hash_to_list(input)
+    rv = []
+    input.each do |item, count|
+      rv << [item] * count
+    end
+    return rv.flatten
+  end
+
   def starting_hand(&block)
     return enum_for(:starting_hand) unless block_given?
 
-    @decklist.each_key do |k|
-      rv = {k => 1}
-      yield rv
+    # This is a sorted version of the main odometer algorithm.
+    # decklist = @decklist.clone
+    # hand = {}
+    # while True do
+    #   -> Add this slot's odometer by populating it with the available cards
+    #   -> at this point.
+    #   odoms.push([e for e in deck.keys() if deck[e] > 0].sort)
+    #
+    #   card = odoms[-1].shift
+    #   decklist[card] -= 1
+    #   hand[card] += 1
+    #
+    #   if hand.len < @initial_draw
+    #     continue
+    #   end
+    #
+    #   yield hand
+    #
+    #   hand[card] -= 1
+    #   decklist[card] += 1
+    #
+    # end
+
+    hash_to_list(@decklist).combination(@initial_draw).to_a.uniq.each do |hand|
+      yield list_to_hash(hand)
     end
   end
 

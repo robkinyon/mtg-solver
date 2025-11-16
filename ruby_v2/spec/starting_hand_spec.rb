@@ -1,20 +1,63 @@
 describe "starting hand" do
   it "handles draw 1 from 1/1" do
-    solver = MTG::Solver.new(
+    starting_hand_test(
       decklist: {
         MTG::Solver::Card.land => 1,
         MTG::Solver::Card.bolt => 1,
       },
-      algo: "fake",
       initial_draw: 1,
+      expected: [
+        {
+          MTG::Solver::Card.land => 1,
+        },
+        {
+          MTG::Solver::Card.bolt => 1,
+        },
+      ],
     )
-    expect(solver.starting_hand).to match_array([
-      {
-        MTG::Solver::Card.land => 1,
+  end
+
+  it "handles draw 2 from 2/2" do
+    starting_hand_test(
+      decklist: {
+        MTG::Solver::Card.land => 2,
+        MTG::Solver::Card.bolt => 2,
       },
-      {
-        MTG::Solver::Card.bolt => 1,
+      initial_draw: 2,
+      expected: [
+        {
+          MTG::Solver::Card.land => 2,
+        },
+        {
+          MTG::Solver::Card.land => 1,
+          MTG::Solver::Card.bolt => 1,
+        },
+        {
+          MTG::Solver::Card.bolt => 2,
+        },
+      ],
+    )
+  end
+
+  it "handles draw 2 from 3/3" do
+    starting_hand_test(
+      decklist: {
+        MTG::Solver::Card.land => 3,
+        MTG::Solver::Card.bolt => 3,
       },
-    ])
+      initial_draw: 2,
+      expected: [
+        {
+          MTG::Solver::Card.land => 2,
+        },
+        {
+          MTG::Solver::Card.land => 1,
+          MTG::Solver::Card.bolt => 1,
+        },
+        {
+          MTG::Solver::Card.bolt => 2,
+        },
+      ],
+    )
   end
 end

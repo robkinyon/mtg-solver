@@ -6,6 +6,15 @@ end
 
 require 'mtg/solver'
 
+def starting_hand_test(decklist:, initial_draw:, expected:)
+  solver = MTG::Solver.new(
+    decklist: decklist,
+    algo: "fake",
+    initial_draw: initial_draw,
+  )
+  expect(solver.starting_hand).to match_array(expected)
+end
+
 def run_test(deck:, conditions:, expected:)
   algo = Proc.new do |g|
     g.play(card: MTG::Solver::Card.land, destination: g.in_play)
