@@ -1,5 +1,5 @@
 --color
 --tty
---require spec_helper
+-r spec_helper
 -I lib
 --order rand

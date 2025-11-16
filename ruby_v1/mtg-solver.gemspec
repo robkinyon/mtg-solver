@@ -1,8 +1,9 @@
-require 'mtg/solver/version'
+#$LOAD_PATH.unshift 'lib'
+#require 'mtg/solver/version'
 
 Gem::Specification.new do |s|
   s.name    = 'mtg-solver'
-  s.version = MTG::Solver::VERSION
+  s.version = '0.0.1' #MTG::Solver::VERSION
   s.author  = 'Rob Kinyon'
   s.email   = 'rob.kinyon@gmail.com'
   s.summary = 'Magic: the Gathering solver'
@@ -11,11 +12,11 @@ Gem::Specification.new do |s|
   s.homepage = 'https://github.com/robkinyon/mtg-solver'
 
   # Don't tramp along our dot-files, except for .rspec
-  s.files         = `git ls-files`.split("\n").select { |filename|
+  s.files         = `git ls-files ruby_v1`.split("\n").select { |filename|
     !filename.match(/^\./) || filename == '.rspec'
   }
-  s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
-  s.executables   = `git ls-files -- {bin}/*`.split("\n")
+  s.test_files    = `git ls-files ruby_v1 -- {test,spec,features}/*`.split("\n")
+  s.executables   = `git ls-files ruby_v1 -- {bin}/*`.split("\n")
   s.require_paths = %w(lib)
 
   s.required_ruby_version = '>= 3'
