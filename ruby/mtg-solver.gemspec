@@ -1,8 +1,8 @@
-require 'mtg/solver/version'
+#require 'mtg/solver/version'
 
 Gem::Specification.new do |s|
   s.name    = 'mtg-solver'
-  s.version = MTG::Solver::VERSION
+  s.version = '0.0.1' #MTG::Solver::VERSION
   s.author  = 'Rob Kinyon'
   s.email   = 'rob.kinyon@gmail.com'
   s.summary = 'Magic: the Gathering solver'
@@ -21,10 +21,11 @@ Gem::Specification.new do |s|
   s.required_ruby_version = '>= 3'
 
   s.add_dependency 'unique_permutation'
+  #s.add_dependency 'erb', '<6'
 
-  s.add_development_dependency 'rake', '~> 10'
-  s.add_development_dependency 'rspec', '~> 3.0.0', '>= 3.0.0'
-  s.add_development_dependency 'simplecov', '~> 0'
-  s.add_development_dependency 'rubygems-tasks', '~> 0'
-  s.add_development_dependency 'json', '~> 1', '>=1.7.7'
+  s.add_development_dependency 'rake'
+  s.add_development_dependency 'rspec'
+  s.add_development_dependency 'simplecov'
+  s.add_development_dependency 'rubygems-tasks'
+  s.add_development_dependency 'json'
 end
