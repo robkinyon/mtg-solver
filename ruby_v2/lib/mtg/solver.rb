@@ -1,23 +1,24 @@
 require "mtg/solver/version"
 require "mtg/solver/cards"
+require "mtg/solver/game"
 
 class MTG::Solver
   attr_accessor :initial_life
   attr_accessor :initial_draw, :lands_per_turn
   attr_accessor :mana_per_bolt, :dmg_per_bolt
 
-  attr_reader :algo, :decklist
+  attr_reader :algo, :decklist, :wins
 
   def initialize(
     decklist:,
     algo:,
-    initial_life: 7,
+    opponent_life: 7,
     initial_draw: 7,
     lands_per_turn: 1,
     mana_per_bolt: 1,
     dmg_per_bolt: 1
   )
-    @initial_life = initial_life
+    @opponent_life = opponent_life
     @initial_draw = initial_draw
     @lands_per_turn = lands_per_turn
     @mana_per_bolt = mana_per_bolt
@@ -25,6 +26,10 @@ class MTG::Solver
 
     @algo = algo
     @decklist = decklist
+
+    @decksize = 0
+    @decklist.each_value {|count| @decksize += count}
+    @wins = Hash.new(0)
   end
 
   def list_to_hash(input)
@@ -75,43 +80,59 @@ class MTG::Solver
   end
 
   def solve
-    # results = (0) x D
-    # foreach starting_hand:
-    #     clone the decklist
-    #     decrement the decklist for the starting hand
-    #
-    #     create the Game object
-    #     --> Stack of game states
-    #     --> Game state contains permanents, graveyard, hand, life remaining
-    #         --> State is end of turn, after algo has run
-    #         --> game.turn() == len(states)
-    #
-    #     while True:
-    #         -> Add this slot's odometer by populating it with the available cards
-    #         -> at this point.
-    #         odoms.push([e for e in deck.keys() if deck[e] > 0])
-    #
-    #         -> It doesn't matter which card is grabbed at any given moment.
-    #         card = odoms[-1].pop()
-    #
-    #         decklist[card] -= 1
-    #         game_finished = algo(game, card)
-    #         if not game_finished:
-    #             continue
-    #
-    #         -> Capture probability of this sequence leading the deck by calculating
-    #         -> the combination of cards remaining
-    #         results[game.turn()] += remaining_probabilities(decklist)
-    #
-    #         last_game_state = game.pop_last_gamestate()
-    #         decklist[last_game_state.card()] += 1
-    #
-    #         while len(odoms) > 0 && len(odoms[-1]) == 0:
-    #             odoms.pop(-1)
-    #             last_game_state = game.pop_last_gamestate()
-    #             decklist[last_game_state.card()] += 1
-    #
-    #         if len(odoms) == 0:
-    #             break
+    starting_hand.each do |hand|
+      # clone the decklist and decrement it for the starting hand
+      this_decklist = @decklist.clone
+      hand.each {|card, count| this_decklist[card] -= count}
+
+      # create the Game object
+      #  --> Stack of game states
+      #  --> Game state contains permanents, graveyard, hand, life remaining
+      #    --> State is end of turn, after algo has run
+      game = MTG::Solver::Game.new(
+        algo: @algo,
+        initial_hand: hand,
+        opponent_life: @opponent_life,
+        lands_per_turn: @lands_per_turn,
+        mana_per_bolt: @mana_per_bolt,
+        dmg_per_bolt: @dmg_per_bolt,
+      )
+      odoms = []
+
+      odoms.push(this_decklist.keys.filter{|e| e if this_decklist[e] > 0})
+      card = odoms[-1].pop()
+      game.run(card: card)
+      if game.finished?
+        @wins[game.turn] += 1
+      end
+
+      #  while True:
+      #      -> Add this slot's odometer by populating it with the available cards
+      #      -> at this point.
+      #      odoms.push([e for e in deck.keys() if deck[e] > 0])
+      #
+      #      -> It doesn't matter which card is grabbed at any given moment.
+      #      card = odoms[-1].pop()
+      #
+      #      decklist[card] -= 1
+      #      game_finished = algo(game, card)
+      #      if not game_finished:
+      #          continue
+      #
+      #      -> Capture probability of this sequence leading the deck by calculating
+      #      -> the combination of cards remaining
+      #      wins[game.turn()] += remaining_probabilities(decklist)
+      #
+      #      last_game_state = game.pop_last_gamestate()
+      #      decklist[last_game_state.card()] += 1
+      #
+      #      while !odoms.empty? 0 && odoms[-1].empty?
+      #          odoms.pop(-1)
+      #          last_game_state = game.pop_last_gamestate()
+      #          decklist[last_game_state.card()] += 1
+      #
+      #      if odoms.empty?
+      #          break
+    end
   end
 end
