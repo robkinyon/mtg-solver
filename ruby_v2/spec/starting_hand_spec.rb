@@ -7,12 +7,12 @@ describe "starting hand" do
       },
       initial_draw: 1,
       expected: [
-        {
+        [{
           MTG::Solver::Card.land => 1,
-        },
-        {
+        }, 1],
+        [{
           MTG::Solver::Card.bolt => 1,
-        },
+        }, 1],
       ],
     )
   end
@@ -25,16 +25,16 @@ describe "starting hand" do
       },
       initial_draw: 2,
       expected: [
-        {
+        [{
           MTG::Solver::Card.land => 2,
-        },
-        {
+        }, 1],
+        [{
           MTG::Solver::Card.land => 1,
           MTG::Solver::Card.bolt => 1,
-        },
-        {
+        }, 4],
+        [{
           MTG::Solver::Card.bolt => 2,
-        },
+        }, 1],
       ],
     )
   end
@@ -47,16 +47,16 @@ describe "starting hand" do
       },
       initial_draw: 2,
       expected: [
-        {
+        [{
           MTG::Solver::Card.land => 2,
-        },
-        {
+        }, 3],
+        [{
           MTG::Solver::Card.land => 1,
           MTG::Solver::Card.bolt => 1,
-        },
-        {
+        }, 9],
+        [{
           MTG::Solver::Card.bolt => 2,
-        },
+        }, 3],
       ],
     )
   end

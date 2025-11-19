@@ -1,3 +1,12 @@
+require 'logger'
+require "pp"
+
+$logger = Logger.new(STDOUT)
+$logger.level = Logger::INFO
+$logger.formatter = proc do |severity, datetime, progname, msg|
+  "#{msg}\n"
+end
+
 require "mtg/solver/version"
 require "mtg/solver/cards"
 require "mtg/solver/game"
@@ -48,6 +57,22 @@ class MTG::Solver
     return rv.flatten
   end
 
+  def factorial(n)
+    (1..n).inject(:*) || 1
+  end
+
+  def binomial_coefficient(d,h)
+    factorial(d)/(factorial(h)*factorial(d-h))
+  end
+
+  # This is a "multivariate hypergeometric distribution".
+  def hand_probability(hand)
+    numerator = hand.keys.reduce(1) {|m,card|
+      m * binomial_coefficient(@decklist[card], hand[card])
+    }
+    return numerator
+  end
+
   def starting_hand(&block)
     return enum_for(:starting_hand) unless block_given?
 
@@ -74,16 +99,19 @@ class MTG::Solver
     #
     # end
 
-    hash_to_list(@decklist).combination(@initial_draw).to_a.uniq.each do |hand|
-      yield list_to_hash(hand)
+    hash_to_list(@decklist).combination(@initial_draw).to_a.uniq.each do |hand_list|
+      hand = list_to_hash(hand_list)
+      p = hand_probability(hand)
+      yield hand, p
     end
   end
 
   def solve
-    starting_hand.each do |hand|
+    starting_hand.each do |hand, hand_probability|
       # clone the decklist and decrement it for the starting hand
       this_decklist = @decklist.clone
       hand.each {|card, count| this_decklist[card] -= count}
+      $logger.debug "****\nH: #{hand} / P: #{hand_probability}"
 
       # create the Game object
       #  --> Stack of game states
@@ -99,40 +127,48 @@ class MTG::Solver
       )
       odoms = []
 
-      odoms.push(this_decklist.keys.filter{|e| e if this_decklist[e] > 0})
-      card = odoms[-1].pop()
-      game.run(card: card)
-      if game.finished?
-        @wins[game.turn] += 1
-      end
+      while true
+        $logger.debug "O1: #{odoms} / T: #{game.turn}"
+        if odoms.empty? || odoms.length <= game.turn
+          odoms.push(this_decklist.keys.filter{|e| e if this_decklist[e] > 0})
+        end
+        $logger.debug "O2: #{odoms}"
 
-      #  while True:
-      #      -> Add this slot's odometer by populating it with the available cards
-      #      -> at this point.
-      #      odoms.push([e for e in deck.keys() if deck[e] > 0])
-      #
-      #      -> It doesn't matter which card is grabbed at any given moment.
-      #      card = odoms[-1].pop()
-      #
-      #      decklist[card] -= 1
-      #      game_finished = algo(game, card)
-      #      if not game_finished:
-      #          continue
-      #
-      #      -> Capture probability of this sequence leading the deck by calculating
-      #      -> the combination of cards remaining
-      #      wins[game.turn()] += remaining_probabilities(decklist)
-      #
-      #      last_game_state = game.pop_last_gamestate()
-      #      decklist[last_game_state.card()] += 1
-      #
-      #      while !odoms.empty? 0 && odoms[-1].empty?
-      #          odoms.pop(-1)
-      #          last_game_state = game.pop_last_gamestate()
-      #          decklist[last_game_state.card()] += 1
-      #
-      #      if odoms.empty?
-      #          break
+        remaining_probabilities = this_decklist.values.reduce(1) {|m,n| m*[n,1].max}
+
+        card = odoms[-1].shift
+        this_decklist[card] -= 1
+
+        game.run(card: card)
+        $logger.debug "O3: #{odoms}"
+        next if !game.finished?
+
+        # Capture probability of this sequence leading the deck by calculating
+        # the combination of cards remaining
+        # wins[game.turn()] += remaining_probabilities(decklist)
+        $logger.debug "W: #{@wins} / #{game.turn} / #{remaining_probabilities}"
+        $logger.debug "DL2: #{this_decklist}"
+        @wins[game.turn] += remaining_probabilities * hand_probability
+
+        # First, pop the last turn played.
+        last_game_state = game.pop_last_gamestate
+        this_decklist[last_game_state.card] += 1
+        $logger.debug "DL3: #{this_decklist}"
+
+        # Then, if the last odometer is empty, pop it.
+        #odoms.pop if odoms[-1].empty?
+
+        # Finally, while the last odometer is empty, pop it and the last turn played.
+        while !odoms.empty? && odoms[-1].empty?
+          odoms.pop
+          last_game_state = game.pop_last_gamestate
+          this_decklist[last_game_state.card] += 1 if last_game_state.card
+          $logger.debug "DL4: #{this_decklist}"
+        end
+        $logger.debug "DL5: #{this_decklist}"
+
+        break if odoms.empty?
+      end
     end
   end
 end

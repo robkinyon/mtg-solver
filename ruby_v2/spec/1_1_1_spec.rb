@@ -17,33 +17,33 @@ describe "basic" do
         expected: {1 => 2},
         #calls: 2,
         #total: 2,
-        #permutations: 2,
+        permutations: 2,
       )
     end
-    xit "handles LLB" do
+    it "handles LLB" do
       run_test(
         deck: {
           MTG::Solver::Card.land => 2,
           MTG::Solver::Card.bolt => 1,
         },
         conditions: @conditions,
-        expected: {1 => 2, 2 => 1},
+        expected: {1 => 4, 2 => 2},
         #calls: 3,
         #total: 3,
-        #permutations: 6,
+        permutations: 6,
       )
     end
-    xit "handles LBB" do
+    it "handles LBB" do
       run_test(
         deck: {
           MTG::Solver::Card.land => 1,
           MTG::Solver::Card.bolt => 2,
         },
         conditions: @conditions,
-        expected: {1 => 2, 2 => 1},
+        expected: {1 => 4, 2 => 2},
         #calls: 3,
         #total: 3,
-        #permutations: 6,
+        permutations: 6,
       )
     end
   end

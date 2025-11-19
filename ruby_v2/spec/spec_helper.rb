@@ -15,7 +15,7 @@ def starting_hand_test(decklist:, initial_draw:, expected:)
   expect(solver.starting_hand).to match_array(expected)
 end
 
-def run_test(deck:, conditions:, expected:)
+def run_test(deck:, conditions:, expected:, permutations:)
   algo = Proc.new do |g|
     g.play(card: MTG::Solver::Card.land, destination: "in_play")
     mana = g.in_play[MTG::Solver::Card.land]
@@ -39,5 +39,5 @@ def run_test(deck:, conditions:, expected:)
   expect(solver.wins).to eq(expected)
   # expect(solver.calls).to eq(calls)
   # expect(solver.total).to eq(total)
-  # expect(solver.permutations).to eq(permutations)
+  expect(solver.wins.values.sum).to eq(permutations)
 end

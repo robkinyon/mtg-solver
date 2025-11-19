@@ -1,12 +1,14 @@
 class MTG::Solver::GameState
   attr_accessor :opponent_life
-  attr_accessor :hand, :in_play, :graveyard, :out_of_play
+  attr_accessor :hand, :in_play, :graveyard, :out_of_play, :card
   attr_accessor :lands_per_turn, :mana_per_bolt, :dmg_per_bolt
   attr_accessor :algo
 
+  # Create a clone() method to handle the prev_state path
   def initialize(
     algo: nil,
     prev_state: nil,
+    card: nil,
     hand: nil,
     opponent_life: nil,
     lands_per_turn: nil,
@@ -15,7 +17,7 @@ class MTG::Solver::GameState
   )
     if prev_state
       @algo           = prev_state.algo
-      @opponent_life  = prev_state.opponent_life.clone
+      @opponent_life  = prev_state.opponent_life
       @lands_per_turn = prev_state.lands_per_turn.clone
       @mana_per_bolt  = prev_state.mana_per_bolt.clone
       @dmg_per_bolt   = prev_state.dmg_per_bolt.clone
@@ -23,6 +25,7 @@ class MTG::Solver::GameState
       @in_play        = prev_state.in_play.clone
       @graveyard      = prev_state.graveyard.clone
       @out_of_play    = prev_state.out_of_play.clone
+      @card           = card
     else
       @algo           = algo
       @opponent_life  = opponent_life
@@ -33,16 +36,17 @@ class MTG::Solver::GameState
       @in_play        = Hash.new(0)
       @graveyard      = Array.new()
       @out_of_play    = Hash.new(0)
+      @card           = card
     end
   end
 
-  def run(card:)
-    @hand[card] += 1
+  def run
+    @hand[@card] += 1
     @algo.call self
   end
 
   def play(card:, destination:)
-    return false if !@hand.include?(card)
+    return false if @hand[card] == 0
 
     @hand[card] -= 1
 
@@ -88,7 +92,7 @@ class MTG::Solver::Game
     dmg_per_bolt: 1
   )
     @game_states = [
-      # This is the game state after the initial draw before the first turn.
+      # This is the game state after the initial draw, before the first turn.
       MTG::Solver::GameState.new(
         algo: algo,
         prev_state: nil,
@@ -108,12 +112,17 @@ class MTG::Solver::Game
   def run(card:)
     new_game_state = MTG::Solver::GameState.new(
       prev_state: @game_states[-1],
+      card: card,
     )
     @game_states << new_game_state
-    new_game_state.run(card: card)
+    new_game_state.run
   end
 
   def finished?
     return game_states[-1].finished?
+  end
+
+  def pop_last_gamestate
+    return game_states.pop
   end
 end
