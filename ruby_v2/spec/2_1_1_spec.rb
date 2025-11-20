@@ -17,8 +17,6 @@ describe "basic" do
         },
         conditions: @conditions,
         expected: {"E" => 2},
-        #calls: 2,
-        #total: 2,
         permutations: 2,
       )
     end
@@ -30,8 +28,6 @@ describe "basic" do
         },
         conditions: @conditions,
         expected: {"E" => 6},
-        #calls: 3,
-        #total: 3,
         permutations: 6,
       )
     end
@@ -43,8 +39,6 @@ describe "basic" do
         },
         conditions: @conditions,
         expected: {"E" => 2, 2 => 4},
-        #calls: 3,
-        #total: 3,
         permutations: 6,
       )
     end
