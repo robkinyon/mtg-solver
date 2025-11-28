@@ -2,7 +2,7 @@ class MTG::Solver::GameState
   attr_accessor :opponent_life
   attr_accessor :hand, :in_play, :graveyard, :out_of_play, :card
   attr_accessor :lands_per_turn, :mana_per_bolt, :dmg_per_bolt
-  attr_accessor :algo
+  attr_accessor :algo, :turn
 
   # Create a clone() method to handle the prev_state path
   def initialize(
@@ -13,7 +13,8 @@ class MTG::Solver::GameState
     opponent_life: nil,
     lands_per_turn: nil,
     mana_per_bolt: nil,
-    dmg_per_bolt: nil
+    dmg_per_bolt: nil,
+    turn: nil
   )
     if prev_state
       @algo           = prev_state.algo
@@ -26,6 +27,7 @@ class MTG::Solver::GameState
       @graveyard      = prev_state.graveyard.clone
       @out_of_play    = prev_state.out_of_play.clone
       @card           = card
+      @turn           = prev_state.turn + 1
     else
       @algo           = algo
       @opponent_life  = opponent_life
@@ -37,6 +39,7 @@ class MTG::Solver::GameState
       @graveyard      = Array.new()
       @out_of_play    = Hash.new(0)
       @card           = card
+      @turn           = turn
     end
   end
 
@@ -101,6 +104,7 @@ class MTG::Solver::Game
         mana_per_bolt: mana_per_bolt,
         dmg_per_bolt: dmg_per_bolt,
         hand: initial_hand,
+        turn: 0,
       )
     ]
   end

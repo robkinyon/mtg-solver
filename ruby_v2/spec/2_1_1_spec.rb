@@ -17,7 +17,6 @@ describe "basic" do
         },
         conditions: @conditions,
         expected: {"E" => 2},
-        permutations: 2,
       )
     end
     it "handles LLB" do
@@ -28,7 +27,6 @@ describe "basic" do
         },
         conditions: @conditions,
         expected: {"E" => 6},
-        permutations: 6,
       )
     end
     it "handles LBB" do
@@ -39,7 +37,6 @@ describe "basic" do
         },
         conditions: @conditions,
         expected: {"E" => 2, 2 => 4},
-        permutations: 6,
       )
     end
   end

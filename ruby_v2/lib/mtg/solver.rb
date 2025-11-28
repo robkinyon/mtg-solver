@@ -16,7 +16,7 @@ class MTG::Solver
   attr_accessor :initial_draw, :lands_per_turn
   attr_accessor :mana_per_bolt, :dmg_per_bolt
 
-  attr_reader :algo, :decklist, :wins
+  attr_reader :algo, :decklist, :wins, :decksize
 
   def initialize(
     decklist:,
@@ -36,8 +36,7 @@ class MTG::Solver
     @algo = algo
     @decklist = decklist
 
-    @decksize = 0
-    @decklist.each_value {|count| @decksize += count}
+    @decksize = @decklist.each_value.sum
     @wins = Hash.new(0)
   end
 
@@ -65,12 +64,19 @@ class MTG::Solver
     factorial(d)/(factorial(h)*factorial(d-h))
   end
 
-  # This is a "multivariate hypergeometric distribution".
+  def permutation(d,h)
+    factorial(d)/(factorial(d-h))
+  end
+
   def hand_probability(hand)
-    numerator = hand.keys.reduce(1) {|m,card|
-      m * binomial_coefficient(@decklist[card], hand[card])
-    }
-    return numerator
+    hand.keys.reduce(1) {|m,card|
+      m * permutation(@decklist[card], hand[card])
+    } * (
+      factorial(hand.values.sum) /
+      hand.values.reduce(1){|m,value|
+        m * factorial(value)
+      }
+    )
   end
 
   def starting_hand(&block)
@@ -143,13 +149,14 @@ class MTG::Solver
         $logger.debug "O2: #{odoms}"
 
         remaining_probabilities[game.turn] = this_decklist.values.reduce(1) {|m,n|
-          m*[n,1].max
+          m*factorial(n)
         }
-        $logger.debug "RP: #{remaining_probabilities}"
+        #remaining_probabilities[game.turn] = factorial(this_decklist.values.sum)
 
         if !deck_exhausted
           card = odoms[-1].shift
           this_decklist[card] -= 1
+          $logger.debug "RP: #{remaining_probabilities}"
 
           game.run(card: card)
           $logger.debug "O3: #{odoms}"
@@ -172,10 +179,7 @@ class MTG::Solver
         this_decklist[last_game_state.card] += 1
         $logger.debug "DL3: #{this_decklist}"
 
-        # Then, if the last odometer is empty, pop it.
-        #odoms.pop if odoms[-1].empty?
-
-        # Finally, while the last odometer is empty, pop it and the last turn played.
+        # Then, while the last odometer is empty, pop it and the last turn played.
         while !odoms.empty? && odoms[-1].empty?
           odoms.pop
           # I don't know why this works (yet)

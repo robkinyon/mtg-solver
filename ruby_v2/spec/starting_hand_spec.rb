@@ -27,14 +27,14 @@ describe "starting hand" do
       expected: [
         [{
           MTG::Solver::Card.land => 2,
-        }, 1],
+        }, 2],
         [{
           MTG::Solver::Card.land => 1,
           MTG::Solver::Card.bolt => 1,
-        }, 4],
+        }, 8],
         [{
           MTG::Solver::Card.bolt => 2,
-        }, 1],
+        }, 2],
       ],
     )
   end
@@ -49,14 +49,14 @@ describe "starting hand" do
       expected: [
         [{
           MTG::Solver::Card.land => 2,
-        }, 3],
+        }, 6],
         [{
           MTG::Solver::Card.land => 1,
           MTG::Solver::Card.bolt => 1,
-        }, 9],
+        }, 18],
         [{
           MTG::Solver::Card.bolt => 2,
-        }, 3],
+        }, 6],
       ],
     )
   end

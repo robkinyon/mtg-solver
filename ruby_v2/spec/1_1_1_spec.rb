@@ -7,38 +7,61 @@ describe "basic" do
         dmg_per_bolt: 1,
       }
     }
-    it "handles L/B" do
-      run_test(
-        deck: {
-          MTG::Solver::Card.land => 1,
-          MTG::Solver::Card.bolt => 1,
-        },
-        conditions: @conditions,
-        expected: {1 => 2},
-        permutations: 2,
-      )
+    describe "2-card" do
+      it "handles L/B" do
+        run_test(
+          deck: {
+            MTG::Solver::Card.land => 1,
+            MTG::Solver::Card.bolt => 1,
+          },
+          conditions: @conditions,
+          expected: {1 => 2},
+        )
+      end
     end
-    it "handles LLB" do
-      run_test(
-        deck: {
-          MTG::Solver::Card.land => 2,
-          MTG::Solver::Card.bolt => 1,
-        },
-        conditions: @conditions,
-        expected: {1 => 4, 2 => 2},
-        permutations: 6,
-      )
+    describe "3-card" do
+      it "handles LLB" do
+        run_test(
+          deck: {
+            MTG::Solver::Card.land => 2,
+            MTG::Solver::Card.bolt => 1,
+          },
+          conditions: @conditions,
+          expected: {1 => 4, 2 => 2},
+        )
+      end
+      it "handles LBB" do
+        run_test(
+          deck: {
+            MTG::Solver::Card.land => 1,
+            MTG::Solver::Card.bolt => 2,
+          },
+          conditions: @conditions,
+          expected: {1 => 4, 2 => 2},
+        )
+      end
     end
-    it "handles LBB" do
-      run_test(
-        deck: {
-          MTG::Solver::Card.land => 1,
-          MTG::Solver::Card.bolt => 2,
-        },
-        conditions: @conditions,
-        expected: {1 => 4, 2 => 2},
-        permutations: 6,
-      )
+    describe "4-card" do
+      it "handles LLLB" do
+        run_test(
+          deck: {
+            MTG::Solver::Card.land => 3,
+            MTG::Solver::Card.bolt => 1,
+          },
+          conditions: @conditions,
+          expected: {1 => 12, 2 => 6, 3 => 6},
+        )
+      end
+      it "handles LLBB" do
+        run_test(
+          deck: {
+            MTG::Solver::Card.land => 2,
+            MTG::Solver::Card.bolt => 2,
+          },
+          conditions: @conditions,
+          expected: {1 => 16, 2 => 8},
+        )
+      end
     end
   end
 end

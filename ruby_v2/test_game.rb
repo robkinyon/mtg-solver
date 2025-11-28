@@ -26,7 +26,7 @@ decklist = {
 solver = MTG::Solver.new(
   decklist: decklist,
   algo: algo,
-  opponent_life: 2,
+  opponent_life: 1,
   initial_draw: 1,
   lands_per_turn: 1,
   mana_per_bolt: 1,
