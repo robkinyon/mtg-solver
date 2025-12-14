@@ -35,6 +35,8 @@ portable touchscreen monitor and bluetooth keyboard (no mouse).
 This is the implementation I started with because it was quickest to sketch out
 the details. It is not performant enough on my S20+.
 
+Make sure `export GEM_HOME=~/.gem` is set, otherwise stuff won't work.
+
 ## Rust
 
 I'm using this to learn Rust and (hopefully) it will be performant enough on my
