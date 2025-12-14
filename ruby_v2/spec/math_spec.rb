@@ -19,6 +19,19 @@ describe "Math Assumptions" do
     describe "multivariate hypergeometric distribution" do
     end
   end
+
+  deck_permutations = [
+    "LB/1",
+    "LLB/1", "LLB/2",
+    "LLLB/1", #"LLLB/2", "LLLB/3",
+    #"LLBB/1", "LLBB/2", "LLBB/3",
+    #"LLLLB/1", "LLLLB/2", "LLLLB/3", "LLLLB/4",
+    #"LLLBB/1", "LLLBB/2", "LLLBB/3", "LLLBB/4",
+    #"LLLLLB/1", "LLLLLB/2", "LLLLLB/3", "LLLLLB/4", "LLLLLB/5",
+    #"LLLLBB/1", "LLLLBB/2", "LLLLBB/3", "LLLLBB/4", "LLLLBB/5",
+    #"LLLBBB/1", "LLLBBB/2", "LLLBBB/3", "LLLBBB/4", "LLLBBB/5",
+  ]
+
   context "sum(hand probability * remaining probabilities) == permutations" do
     def testit(decklist:, initial_draw:)
       solver = MTG::Solver.new(
@@ -37,17 +50,7 @@ describe "Math Assumptions" do
       expect(calculated_permutations).to eq(permutations)
     end
 
-    [
-      "LB/1",
-      "LLB/1", "LLB/2",
-      "LLLB/1", "LLLB/2", "LLLB/3",
-      "LLBB/1", "LLBB/2", "LLBB/3",
-      "LLLLB/1", "LLLLB/2", "LLLLB/3", "LLLLB/4",
-      "LLLBB/1", "LLLBB/2", "LLLBB/3", "LLLBB/4",
-      "LLLLLB/1", "LLLLLB/2", "LLLLLB/3", "LLLLLB/4", "LLLLLB/5",
-      "LLLLBB/1", "LLLLBB/2", "LLLLBB/3", "LLLLBB/4", "LLLLBB/5",
-      "LLLBBB/1", "LLLBBB/2", "LLLBBB/3", "LLLBBB/4", "LLLBBB/5",
-    ].each do |decklist|
+    deck_permutations.each do |decklist|
       match = decklist.match(%r{(L+)(B+)/(\d+)})
       it "handles #{decklist}" do
         testit(
@@ -76,17 +79,7 @@ describe "Math Assumptions" do
       expect(solver.wins.values.sum).to eq(permutations)
     end
 
-    [
-      "LB/1",
-      "LLB/1", "LLB/2",
-      "LLLB/1", #"LLLB/2", "LLLB/3",
-      #"LLBB/1", "LLBB/2", "LLBB/3",
-      #"LLLLB/1", "LLLLB/2", "LLLLB/3", "LLLLB/4",
-      #"LLLBB/1", "LLLBB/2", "LLLBB/3", "LLLBB/4",
-      #"LLLLLB/1", "LLLLLB/2", "LLLLLB/3", "LLLLLB/4", "LLLLLB/5",
-      #"LLLLBB/1", "LLLLBB/2", "LLLLBB/3", "LLLLBB/4", "LLLLBB/5",
-      #"LLLBBB/1", "LLLBBB/2", "LLLBBB/3", "LLLBBB/4", "LLLBBB/5",
-    ].each do |decklist|
+    deck_permutations.each do |decklist|
       match = decklist.match(%r{(L+)(B+)/(\d+)})
       num_land = match[1].length
       num_bolt = match[2].length

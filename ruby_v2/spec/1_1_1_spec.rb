@@ -42,7 +42,7 @@ describe "basic" do
       end
     end
     describe "4-card" do
-      it "handles LLLB" do
+      it "handles LLLB/1" do
         run_test(
           deck: {
             MTG::Solver::Card.land => 3,
@@ -52,7 +52,7 @@ describe "basic" do
           expected: {1 => 12, 2 => 6, 3 => 6},
         )
       end
-      it "handles LLBB" do
+      it "handles LLBB/1" do
         run_test(
           deck: {
             MTG::Solver::Card.land => 2,
