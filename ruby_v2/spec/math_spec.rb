@@ -16,8 +16,6 @@ describe "Math Assumptions" do
         expect(@solver.binomial_coefficient(5, 2)).to eq(10)
       end
     end
-    describe "multivariate hypergeometric distribution" do
-    end
   end
 
   deck_permutations = [
@@ -63,6 +61,7 @@ describe "Math Assumptions" do
       end
     end
   end
+
   context "remaining_probabilities at each level are correct" do
     def testit(decklist:, initial_draw:, win_at:)
       algo = Proc.new do |g|

@@ -60,15 +60,26 @@ class MTG::Solver
     (1..n).inject(:*) || 1
   end
 
-  def binomial_coefficient(d,h)
-    factorial(d)/(factorial(h)*factorial(d-h))
+  def binomial_coefficient(n,k)
+    factorial(n)/(factorial(k)*factorial(n-k))
+    # Also, permutation(n,k) / factorial(k)
   end
 
-  def permutation(d,h)
-    factorial(d)/(factorial(d-h))
+  def permutation(n,k)
+    factorial(n)/factorial(n-k)
+  end
+
+  # Multivariate Hypergeometric Distribution
+  # https://en.wikipedia.org/wiki/Hypergeometric_distribution#Multivariate_hypergeometric_distribution
+  def mvhd(decklist, hand)
+    hand.keys.reduce(1) {|m,card|
+      m * binomial_coefficient(decklist[card], hand[card])
+    }.to_f / binomial_coefficient(decklist.values.sum, hand.values.sum)
   end
 
   def hand_probability(hand)
+    # Calculates ordered permutations for drawing this hand from the deck
+    # Product of P(n_i, k_i) for each card type × multinomial coefficient
     hand.keys.reduce(1) {|m,card|
       m * permutation(@decklist[card], hand[card])
     } * (
@@ -112,6 +123,10 @@ class MTG::Solver
     end
   end
 
+  def unique_cards(cardlist)
+    cardlist.keys.filter{|e| e if cardlist[e] > 0}
+  end
+
   def solve
     starting_hand.each do |hand, hand_probability|
       # clone the decklist and decrement it for the starting hand
@@ -143,7 +158,8 @@ class MTG::Solver
             $logger.debug "EX: #{hand_probability}"
             deck_exhausted = true
           else
-            odoms.push(this_decklist.keys.filter{|e| e if this_decklist[e] > 0})
+            odoms.push(unique_cards(this_decklist))
+            #odoms.push(this_decklist.keys.filter{|e| e if this_decklist[e] > 0})
           end
         end
         $logger.debug "O2: #{odoms}"
@@ -151,7 +167,6 @@ class MTG::Solver
         remaining_probabilities[game.turn] = this_decklist.values.reduce(1) {|m,n|
           m*factorial(n)
         }
-        #remaining_probabilities[game.turn] = factorial(this_decklist.values.sum)
 
         if !deck_exhausted
           card = odoms[-1].shift
