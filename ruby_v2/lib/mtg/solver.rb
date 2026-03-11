@@ -127,6 +127,14 @@ class MTG::Solver
     cardlist.keys.filter{|e| e if cardlist[e] > 0}
   end
 
+  def all_cards(cardlist)
+    cards = []
+    cardlist.each do |card, count|
+      count.times { cards << card }
+    end
+    cards
+  end
+
   def solve
     starting_hand.each do |hand, hand_probability|
       # clone the decklist and decrement it for the starting hand
@@ -134,82 +142,60 @@ class MTG::Solver
       hand.each {|card, count| this_decklist[card] -= count}
       $logger.debug "****\nH: #{hand} / P: #{hand_probability} / W: #{@wins}"
 
-      # create the Game object
-      #  --> Stack of game states
-      #  --> Game state contains permanents, graveyard, hand, life remaining
-      #    --> State is end of turn, after algo has run
-      game = MTG::Solver::Game.new(
-        algo: @algo,
-        initial_hand: hand,
-        opponent_life: @opponent_life,
-        lands_per_turn: @lands_per_turn,
-        mana_per_bolt: @mana_per_bolt,
-        dmg_per_bolt: @dmg_per_bolt,
+      # Iterate through all possible remaining card position permutations
+      remaining_cards = hash_to_list(this_decklist)
+      explore_permutations(
+        remaining_cards: remaining_cards,
+        game: MTG::Solver::Game.new(
+          algo: @algo,
+          initial_hand: hand,
+          opponent_life: @opponent_life,
+          lands_per_turn: @lands_per_turn,
+          mana_per_bolt: @mana_per_bolt,
+          dmg_per_bolt: @dmg_per_bolt,
+        ),
+        hand_probability: hand_probability,
+        index: 0
       )
+    end
+  end
 
-      odoms = []
-      remaining_probabilities = []
-      deck_exhausted = false
-      while true
-        $logger.debug "O1: #{odoms} / T: #{game.turn}"
-        if odoms.empty? || odoms.length <= game.turn
-          # If we don't have any cards more to draw, then we have hit deck exhaustion.
-          if this_decklist.values.sum == 0
-            $logger.debug "EX: #{hand_probability}"
-            deck_exhausted = true
-          else
-            odoms.push(unique_cards(this_decklist))
-            #odoms.push(this_decklist.keys.filter{|e| e if this_decklist[e] > 0})
-          end
-        end
-        $logger.debug "O2: #{odoms}"
+  def explore_permutations(remaining_cards:, game:, hand_probability:, index:)
+    # If all cards drawn or deck exhausted
+    if index >= remaining_cards.length
+      # Record outcome
+      outcome = game.finished? ? game.turn : "E"
+      @wins[outcome] += hand_probability
+      return
+    end
 
-        remaining_probabilities[game.turn] = this_decklist.values.reduce(1) {|m,n|
-          m*factorial(n)
-        }
-
-        if !deck_exhausted
-          card = odoms[-1].shift
-          this_decklist[card] -= 1
-          $logger.debug "RP: #{remaining_probabilities}"
-
-          game.run(card: card)
-          $logger.debug "O3: #{odoms}"
-          next if !game.finished?
-
-          # Capture probability of this sequence leading the deck by calculating
-          # the combination of cards remaining
-          $logger.debug "W: #{@wins} / #{game.turn} / #{remaining_probabilities}"
-          $logger.debug "DL2: #{this_decklist}"
-
-          winning_turn = game.turn
-        else
-          $logger.debug "HP: #{hand_probability} / RP: #{remaining_probabilities}"
-          winning_turn = "E"
-          deck_exhausted = false
-        end
-
-        # First, pop the last turn played.
-        last_game_state = game.pop_last_gamestate
-        this_decklist[last_game_state.card] += 1
-        $logger.debug "DL3: #{this_decklist}"
-
-        # Then, while the last odometer is empty, pop it and the last turn played.
-        while !odoms.empty? && odoms[-1].empty?
-          odoms.pop
-          # I don't know why this works (yet)
-          remaining_probabilities.pop if remaining_probabilities.length > 1
-          last_game_state = game.pop_last_gamestate
-          this_decklist[last_game_state.card] += 1 if last_game_state.card
-          $logger.debug "DL4: #{this_decklist}"
-        end
-
-        @wins[winning_turn] += remaining_probabilities[-1] * hand_probability
-
-        $logger.debug "DL5: #{this_decklist}"
-
-        break if odoms.empty?
+    # Try each remaining card at this position
+    (index...remaining_cards.length).each do |next_index|
+      # Swap cards
+      remaining_cards[index], remaining_cards[next_index] = remaining_cards[next_index], remaining_cards[index]
+      
+      # Draw this card and run game only if not finished
+      card = remaining_cards[index]
+      initial_game_states_length = game.game_states.length
+      if !game.finished?
+        game.run(card: card)
       end
+      
+      # Recurse to next position
+      explore_permutations(
+        remaining_cards: remaining_cards,
+        game: game,
+        hand_probability: hand_probability,
+        index: index + 1
+      )
+      
+      # Backtrack - only pop if we actually added a game state
+      if game.game_states.length > initial_game_states_length
+        game.pop_last_gamestate
+      end
+      
+      # Swap back
+      remaining_cards[index], remaining_cards[next_index] = remaining_cards[next_index], remaining_cards[index]
     end
   end
 end
