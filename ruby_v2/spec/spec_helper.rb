@@ -15,8 +15,8 @@ def starting_hand_test(decklist:, initial_draw:, expected:)
   expect(solver.starting_hand).to match_array(expected)
 end
 
-def run_test(deck:, conditions:, expected:)
-  algo = Proc.new do |g|
+def goldfish_algo
+  Proc.new do |g|
     g.play(card: MTG::Solver::Card.land, destination: "in_play")
     mana = g.in_play[MTG::Solver::Card.land]
     while mana >= g.mana_per_bolt
@@ -28,10 +28,12 @@ def run_test(deck:, conditions:, expected:)
       end
     end
   end
+end
 
+def run_test(deck:, conditions:, expected:)
   solver = MTG::Solver.new(
     decklist: deck,
-    algo: algo,
+    algo: goldfish_algo,
     **conditions,
   )
   permutations = solver.factorial(solver.decksize)

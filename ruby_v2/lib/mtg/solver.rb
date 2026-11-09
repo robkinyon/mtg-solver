@@ -25,16 +25,19 @@ class MTG::Solver
     initial_draw: 7,
     lands_per_turn: 1,
     mana_per_bolt: 1,
-    dmg_per_bolt: 1
+    dmg_per_bolt: 1,
+    memoize: true
   )
     @opponent_life = opponent_life
     @initial_draw = initial_draw
     @lands_per_turn = lands_per_turn
     @mana_per_bolt = mana_per_bolt
     @dmg_per_bolt = dmg_per_bolt
+    @memoize = memoize
 
     @algo = algo
     @decklist = decklist
+    @card_types = @decklist.keys
 
     @decksize = @decklist.each_value.sum
     @wins = Hash.new(0)
@@ -93,34 +96,13 @@ class MTG::Solver
   def starting_hand(&block)
     return enum_for(:starting_hand) unless block_given?
 
-    # This is a sorted version of the main odometer algorithm.
-    # decklist = @decklist.clone
-    # hand = {}
-    # while True do
-    #   -> Add this slot's odometer by populating it with the available cards
-    #   -> at this point.
-    #   odoms.push([e for e in deck.keys() if deck[e] > 0].sort)
-    #
-    #   card = odoms[-1].shift
-    #   decklist[card] -= 1
-    #   hand[card] += 1
-    #
-    #   if hand.len < @initial_draw
-    #     continue
-    #   end
-    #
-    #   yield hand
-    #
-    #   hand[card] -= 1
-    #   decklist[card] += 1
-    #
-    # end
-
-    hash_to_list(@decklist).combination(@initial_draw).to_a.uniq.each do |hand_list|
-      hand = list_to_hash(hand_list)
-      p = hand_probability(hand)
-      yield hand, p
-    end
+    enumerate_starting_hands(
+      card_types: @card_types,
+      index: 0,
+      cards_to_draw: @initial_draw,
+      hand: Hash.new(0),
+      &block
+    )
   end
 
   def unique_cards(cardlist)
@@ -136,16 +118,15 @@ class MTG::Solver
   end
 
   def solve
+    @memo = {} if @memoize
+
     starting_hand.each do |hand, hand_probability|
-      # clone the decklist and decrement it for the starting hand
       this_decklist = @decklist.clone
       hand.each {|card, count| this_decklist[card] -= count}
       $logger.debug "****\nH: #{hand} / P: #{hand_probability} / W: #{@wins}"
 
-      # Iterate through all possible remaining card position permutations
-      remaining_cards = hash_to_list(this_decklist)
-      explore_permutations(
-        remaining_cards: remaining_cards,
+      outcomes = explore_permutations(
+        remaining_cards: this_decklist,
         game: MTG::Solver::Game.new(
           algo: @algo,
           initial_hand: hand,
@@ -153,49 +134,87 @@ class MTG::Solver
           lands_per_turn: @lands_per_turn,
           mana_per_bolt: @mana_per_bolt,
           dmg_per_bolt: @dmg_per_bolt,
-        ),
-        hand_probability: hand_probability,
-        index: 0
+        )
       )
+      outcomes.each do |outcome, count|
+        @wins[outcome] += hand_probability * count
+      end
     end
   end
 
-  def explore_permutations(remaining_cards:, game:, hand_probability:, index:)
-    # If all cards drawn or deck exhausted
-    if index >= remaining_cards.length
-      # Record outcome
+  def explore_permutations(remaining_cards:, game:)
+    remaining_count = remaining_cards.values.sum
+
+    if game.finished? || remaining_count.zero?
       outcome = game.finished? ? game.turn : "E"
-      @wins[outcome] += hand_probability
+      return { outcome => factorial(remaining_count) }
+    end
+
+    key = game_state_key(remaining_cards, game) if @memoize
+    return @memo[key] if @memoize && @memo.key?(key)
+
+    outcomes = Hash.new(0)
+    remaining_cards.each do |card, count|
+      next if count.zero?
+
+      remaining_cards[card] -= 1
+      game.run(card: card)
+      branch_outcomes = explore_permutations(
+        remaining_cards: remaining_cards,
+        game: game
+      )
+      branch_outcomes.each do |outcome, branch_count|
+        outcomes[outcome] += count * branch_count
+      end
+      game.pop_last_gamestate
+      remaining_cards[card] += 1
+    end
+
+    @memo[key] = outcomes.freeze if @memoize
+    outcomes
+  end
+
+  private
+
+  def enumerate_starting_hands(card_types:, index:, cards_to_draw:, hand:, &block)
+    if index == card_types.length
+      yield hand.dup, hand_probability(hand) if cards_to_draw.zero?
       return
     end
 
-    # Try each remaining card at this position
-    (index...remaining_cards.length).each do |next_index|
-      # Swap cards
-      remaining_cards[index], remaining_cards[next_index] = remaining_cards[next_index], remaining_cards[index]
-      
-      # Draw this card and run game only if not finished
-      card = remaining_cards[index]
-      initial_game_states_length = game.game_states.length
-      if !game.finished?
-        game.run(card: card)
-      end
-      
-      # Recurse to next position
-      explore_permutations(
-        remaining_cards: remaining_cards,
-        game: game,
-        hand_probability: hand_probability,
-        index: index + 1
+    card = card_types[index]
+    cards_after = card_types[(index + 1)..].sum { |type| @decklist[type] }
+    min_count = [0, cards_to_draw - cards_after].max
+    max_count = [@decklist[card], cards_to_draw].min
+
+    (min_count..max_count).each do |count|
+      hand[card] = count if count.positive?
+      enumerate_starting_hands(
+        card_types: card_types,
+        index: index + 1,
+        cards_to_draw: cards_to_draw - count,
+        hand: hand,
+        &block
       )
-      
-      # Backtrack - only pop if we actually added a game state
-      if game.game_states.length > initial_game_states_length
-        game.pop_last_gamestate
-      end
-      
-      # Swap back
-      remaining_cards[index], remaining_cards[next_index] = remaining_cards[next_index], remaining_cards[index]
+      hand.delete(card) if count.positive?
     end
+  end
+
+  def game_state_key(remaining_cards, game)
+    state = game.game_states[-1]
+    [
+      @card_types.map { |card| remaining_cards[card] },
+      state.algo.object_id,
+      state.turn,
+      state.opponent_life,
+      @card_types.map { |card| state.hand[card] },
+      @card_types.map { |card| state.in_play[card] },
+      state.graveyard.dup,
+      @card_types.map { |card| state.out_of_play[card] },
+      state.card,
+      state.lands_per_turn,
+      state.mana_per_bolt,
+      state.dmg_per_bolt,
+    ]
   end
 end

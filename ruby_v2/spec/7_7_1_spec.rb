@@ -33,7 +33,7 @@ describe "basic" do
         },
       )
     end
-    it "handles 8L/8B" do # Takes 13s
+    it "handles 8L/8B" do
       run_test(
         deck: {
           MTG::Solver::Card.land => 8,

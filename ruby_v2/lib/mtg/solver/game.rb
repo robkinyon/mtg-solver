@@ -51,6 +51,11 @@ class MTG::Solver::GameState
   def play(card:, destination:)
     return false if @hand[card] == 0
 
+    unless ["graveyard", "in_play", "out_of_play"].include?(destination)
+      puts "Received '#{destination}' which wasn't understood"
+      return false
+    end
+
     @hand[card] -= 1
 
     # The graveyard is a list because it's ordered. The other destinations
@@ -62,9 +67,6 @@ class MTG::Solver::GameState
       @in_play[card] += 1
     when "out_of_play"
       @out_of_play[card] += 1
-    else
-      puts "Received '#{destination}' which wasn't understood"
-      return false
     end
     return true
   end
